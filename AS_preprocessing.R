@@ -66,9 +66,6 @@ unique(Data_AS$subject)
 #rename pd004_2_2
 Data_AS$subject <- str_replace(Data_AS$subject, "cn15", "cn015")
 
-#rename s with v
-#Data_PS$subject <- str_replace(Data_PS$subject, "s", "v")
-
 # Split into subject and visit column  by v
 Data_AS <- Data_AS %>% 
   separate(subject, into = c("subject", "visit"), 
@@ -169,12 +166,6 @@ Data_AS <- Data_AS[c(1:25, 28:34)]
 Data_AS <- Data_AS %>% group_by(subject_visit) %>% mutate(time = TIMESTAMP - TRIAL_START_TIME) 
 Data_AS <- Data_AS %>% group_by(subject_visit) %>% mutate(time_sec = (TIMESTAMP - TRIAL_START_TIME)/1000) 
 
-#time within each trial
-
-
-#rearrage
-
-
 
 #=============================================================================================
 # check the number of samples/time for each subject to make sure they all have the same sampling rate and amount of data
@@ -204,6 +195,8 @@ df_as <- df_as[c(1:14, 35, 16:34)]
 df_as <- rename(df_as, saccade = saccade_new)
 
 #write.csv(df_as, "df_as.csv")
+
+
 
 #=============================================================================================
 #FILTER FOR DATA FROM TARGET DISPLAY
@@ -269,7 +262,6 @@ as_df_3_test <- as_df_3 %>% group_by(ID_trial) %>% summarise(length(time))
 as_df_4 <- as_df_3 %>%
   dplyr::group_by(subject, TRIAL_INDEX) %>%
   mutate(saccades_inrange = with(rle(saccade), rep(seq_along(lengths), lengths)))
-
 
 
 
