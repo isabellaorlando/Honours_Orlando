@@ -68,9 +68,6 @@ Data_PS$subject <- str_remove(Data_PS$subject, "ps")
 Data_PS$subject <- str_replace(Data_PS$subject, "pd004v2_2", "pd004v2")
 
 
-#rename s with v
-#Data_PS$subject <- str_replace(Data_PS$subject, "s", "v")
-
 # Split into subject and visit column  by v
 Data_PS <- Data_PS %>% 
   separate(subject, into = c("subject", "visit"), 
@@ -328,11 +325,3 @@ final_test <- final_test %>%
 
 
 #go to PS_preprocessing_saccade reports
-
-
-
-
-
-
-
-
