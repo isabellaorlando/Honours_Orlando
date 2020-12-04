@@ -51,10 +51,6 @@ ps_sac_file$ID_sac <- as.factor(ps_sac_file$ID_sac)
 ps_sac_file <- ps_sac_file[c(1:5, 8, 222, 9:14, 23, 27, 42:52, 215:219)]
 
 
-#Option to subset df to only include PD or CN
-#ps_amp_file_PD <- ps_amp_file %>%filter(str_detect(subject, "pd"))
-#ps_amp_file_con <- ps_amp_file %>% filter(str_detect(subject, "cn")) 
-
 #Merge data frames
 merge_PS <- left_join(ps_file, ps_sac_file, by = "ID_sac")
 
@@ -76,12 +72,6 @@ amplitude_ps_id <- rename(amplitude_ps_id, t_y = 't_y.x')
 #saccades that need to be removed
 reduced_amp2 <- amplitude_ps_id %>% filter(CURRENT_SAC_AMPLITUDE < 1.5)
 reduced_amp4 <- amplitude_ps_id %>% filter(CURRENT_SAC_AMPLITUDE > 10)
-
-#test
-#reduced_amp22 <- subset(reduced_amp2, CURRENT_SAC_INDEX == "1")
-
-#ID_sac to keep
-#reduced_amp3 <- amplitude_ps_id %>% filter(CURRENT_SAC_AMPLITUDE >= 1.5)
 
 
 #------------------------------------------------------------------------------------
@@ -783,9 +773,6 @@ ps_latency_out <- ps_latency_test %>%
 
 #=51 trials
 
-#maybe delete saccades with latency less than 80msec - reference paper
-#include in preprocessing - for oculomotor tasks - we removed outliers (+/- 2.5 SD from p mean) 
-#and saccades <80msec latency removed as anticipatory saccades 
 
 #test to see how many saccades are anticipatory
 ps_latency_out2 <- ps_latency_out %>% filter(latency < 80)
