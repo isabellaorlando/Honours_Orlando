@@ -102,7 +102,6 @@ BasePupil <- Data_BP %>% dplyr::mutate(visit = replace_na(visit, 1))
 # check the number of samples/time for each subject to make sure they all have the same sampling rate and amount of data
 
 #calculate length of each trial to make sure all the subjects/vists are for the same length of time
-#BasePupil_length_test <- BasePupil %>% group_by(subject) %>% summarise(length(time))
 
 ##need to cut down cn003 and cn008 to 90000 samples
 #cn003
@@ -161,9 +160,6 @@ cols <- c('subject', 'visit')
 Base_Pupil$subject_visit <- apply(Base_Pupil[ , cols ] , 1 , paste , collapse = "_" )
 
 Base_Pupil$subject_visit <- as.factor(Base_Pupil$subject_visit)
-
-#check length of each trial to make sure all the subjects/vists are for the same length of time
-#BasePupil_length_test <- Base_Pupil %>% group_by(subject_visit) %>% summarise(length(time))
 
 #write.csv(BasePupil_length_test, "BasePupil_triallength.csv")
 
@@ -262,8 +258,6 @@ pup_extend <- Base_Pupil_clean %>%
   group_by(subject_visit) %>% 
   mutate(extendpupil = extend_blinks(pupil, fillback = 100, fillforward = 100, hz=125))
 
-#plot histogram to inspect for extreme pupil values https://rpubs.com/jgeller1/438015
-#can also check range like this: range(pup_extend$extendpupil, na.rm = TRUE)
 
 puphist <- ggplot(pup_extend, aes(x = extendpupil)) + 
             geom_histogram(aes(y = ..count..), colour = "green", binwidth = 0.5) + 
