@@ -79,7 +79,7 @@ HRVparams.Entropy.on = 1;                  % Default: 1, MSE Analysis 1=On or 0=
 %DFA Settings
 HRVparams.DFA.on = 1;                      % Default: 1, DFA Analysis 1=On or 0=Off
 
-%Poincaré plot
+%PoincarÃ© plot
 HRVparams.poincare.on = 1;     % Default: 1, Poincare Analysis 1=On or 0=Off
 
 %Heart Rate Turbulence (HRT) - Settings
@@ -174,7 +174,3 @@ f_pdfs = rdir(fullfile(S.paths.analysis,'Figures_QC/*.pdf')); f_pdfs = {f_pdfs.n
 f_out  = fullfile(S.paths.analysis,'Figures_QC/QC_plots.pdf');
 append_pdfs(f_out,f_pdfs{:});
 
-
-
-
-                                      
