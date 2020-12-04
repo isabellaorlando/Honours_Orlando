@@ -84,9 +84,7 @@ group_by(df_summary, condition) %>%
     sd = sd(pupil_mean, na.rm = TRUE)
   )
   
-## A tibble: 3 x 4
 #condition   count    mean    sd
-#<fct>       <int>   <dbl>   <dbl>
 #  1 Control      25  423.   97.6
 #2 Placebo        18  402.   88.7
 #3 Atomoxetine    18  518.   188. 
@@ -110,15 +108,6 @@ summary(res.aov)
 #95% family-wise confidence level
 TukeyHSD(res.aov)
 
-#                         diff         lwr      upr     p adj
-#Placebo-Control     -21.58507 -119.415535  76.2454 0.8564966
-#Atomoxetine-Control  94.57973   -1.619575 190.7790 0.0549433
-#Atomoxetine-Placebo 116.16479   10.915969 221.4136 0.0272367
-
-#diff: difference between means of the two groups
-#lwr, upr: the lower and the upper end point of the confidence interval at 95% (default)
-#p adj: p-value after adjustment for the multiple comparisons.
-
 bxp <- ggboxplot(df_summary, x = "condition", y = "pupil_mean", add = "point", 
                  ylab = "Mean Pupil Diameter", xlab = "Treatment", 
                  color = "condition", line.color = "gray", line.size = 0.4,
@@ -133,16 +122,12 @@ df_summary %>%
 
 
 #Normality 
-#The normality assumption can be checked by computing Shapiro-Wilk test for each time point. 
-#If the data is normally distributed, the p-value should be greater than 0.05.
+
 df_summary %>%
   group_by(condition) %>%
   shapiro_test(pupil_mean)
 
 ggqqplot(df_summary, "pupil_mean", facet.by = "condition")
-
-# From the plot above, if all the points fall approximately along 
-# the reference line, we can assume normality.
 
 
 #Create df of control and placebo conditions
@@ -223,8 +208,6 @@ p.adjust(p.value, method = "holm")
 
 
 #--------------------------------------------------------------------------------------------------------------------
-
-
 #create new columns placebo and atomoxetine
 
 df_mean_diff <- df_summary_PD_2[c(1:2, 14)]
@@ -306,7 +289,6 @@ pupil_condition_mixed_step_variants_IC <- lapply(mixed_formulae, FUN = function(
   lme4::lmer(formula = formula, data = df_summary_PD, REML = FALSE)
 })
 
-#pupil_condition_mixed_step_variants_IC ??? - zoom at 3
 
 #find p values
 #pupil_condition_mixed_step_variants[["step7"]]
@@ -315,10 +297,5 @@ pupil_condition_mixed_step_variants_IC <- lapply(mixed_formulae, FUN = function(
 #beta values, AIC and BIC
 # pupil_condition_mixed_step_variants_IC[["step7"]]
 # fixed effects = beta values
-
-
-
-
-
 
 
