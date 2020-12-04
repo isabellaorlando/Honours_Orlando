@@ -6,7 +6,7 @@
 # Working directory is filepath of this script -------------------------------------
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
-# Set directories IO -------------------------------------------------------------------
+# Set directories -------------------------------------------------------------------
 
 dataDir_as_amp <- paste0(dirname(getwd()), "/Desktop/Atomoxetine/AntiSaccade/AS_saccade")
 resultsDir_AS <- paste0(dirname(getwd()), "/Desktop/Atomoxetine/AntiSaccade/Results")
@@ -128,9 +128,6 @@ remove <- rename(remove, ID_sac_number = remove)
 remove2 <- rename(remove2, ID_sac_number = remove2)
 
 
-#df_as_fin2_test <- df_as_fin2 %>% group_by(subject_visit) %>% summarise(length(sample))
-
-
 #df with saccades with amplitude <1.5 removed
 edit_amp_as <- df_as_fin2[!df_as_fin2$ID_sac_number %in% remove$ID_sac_number,]
 edit_amp_as <- edit_amp_as[!edit_amp_as$ID_sac_number %in% remove2$ID_sac_number,]
@@ -139,7 +136,6 @@ edit_amp_as <- edit_amp_as[!edit_amp_as$ID_sac_number %in% remove2$ID_sac_number
 
 #------------------------------------------------------------------------------------
 #rearrange saccade_number
-
 
 AS_FIN <- edit_amp_as %>%
   dplyr::group_by(ID_trial) %>%
@@ -155,28 +151,15 @@ AS_FIN <- AS_FIN %>%
 
 #------------------------------------------------------------------------------------
 
-
 #sanity check
 puphist <- ggplot(AS_FIN, aes(x = CURRENT_SAC_AMPLITUDE)) + 
   geom_histogram(aes(y = ..count..), colour = "green", binwidth = 0.5) + 
   xlab("Pupil Size") + ylab("Count") + 
   theme_bw() 
-
 puphist
-
 
 #test length of each 
 AS_FIN_test <- AS_FIN %>% group_by(subject_visit) %>% summarise(length(sample))
-
-
-#average sample length = 10,000 - 30,000
-
-#cn003 has 100,000 samples!
-
-#pd020_2 has 7700 samples
-
-#cn011 has weird results
-
 
 
 #=============================================================================================
@@ -194,11 +177,6 @@ as_correct <- as_correct %>% mutate(correct = ifelse(direction == CURRENT_SAC_DI
 
 as_correct_test <- as_correct %>% dplyr::filter(saccade_number2 == "2")
 
-#as_correct_test5 <- count(as_correct_test2, correct==1)
-#as_correct_test5 <- rename(as_correct_test5, 'correct' = 'correct == 1')
-#1354 rows total 800 rows wrong
-
-
 as_correct_percent <- as_correct_test %>%
   group_by(ID_trial) %>%
   summarise(correct_sum = sum(correct==1))
@@ -207,23 +185,6 @@ as_correct_percent <- as_correct_percent %>% mutate(correct = ifelse(correct_sum
 
 #replace NA with 0
 as_correct_1 <- as_correct_percent %>% dplyr::mutate(correct = replace_na(correct, 0))
-
-
-#------------------------------------------------------------------------------------
-#Looking at the correct proportion of 2nd saccade
-
-as_correct_test2 <- as_correct %>% dplyr::filter(saccade_number2 == "4")
-
-as_correct_2 <- as_correct_test2 %>%
-  group_by(ID_trial) %>%
-  summarise(correct_sum2 = sum(correct==1))
-
-as_correct_2 <- as_correct_2 %>% mutate(correct2 = ifelse(correct_sum2 != 0, "1", "0"))
-
-#replace NA with 0
-as_correct_2 <- as_correct_2 %>% dplyr::mutate(correct2 = replace_na(correct2, 0))
-
-
 
 
 
@@ -344,11 +305,6 @@ AS_sum2 <- AS_sum2 %>% group_by(subject_visit) %>% mutate(corrective_percent = c
 AS_sum2 <- AS_sum2 %>% group_by(subject_visit) %>% mutate(corrective_percent = corrective_percent*100) 
 
 
-#AS_sum2 <- AS_sum2 %>% group_by(subject_visit) %>% mutate(total_corrective = corrective_sum/total_trials) 
-#AS_sum2 <- AS_sum2 %>% group_by(subject_visit) %>% mutate(total_corrective = total_corrective*100) 
-
-
-
 AS_sum2 <- AS_sum2 %>% 
   separate(subject_visit, into = c("subject", "visit"), 
            sep="_")
@@ -446,7 +402,6 @@ t_test_PvA
 
 
 
-
 #=============================================================================================
 #error rate in 1st saccade analysis
 #=============================================================================================
@@ -517,64 +472,6 @@ p.adjust(p.value_er, method = "holm")
 
 
 #=============================================================================================
-#no correct saccade analysis
-#=============================================================================================
-
-nocorrect <- group_by(AS_sum2, condition) %>%
-  summarise(
-    count = n(),
-    mean = mean(no_correct_sac, na.rm = TRUE),
-    sd = sd(no_correct_sac, na.rm = TRUE)
-  )
-
-nocorrect
-#  condition   count  mean    sd
-#1 Control        25  22.6  18.2
-#2 Placebo        18  23.0  17.3
-#3 Atomoxetine    18  27.6  20.7
-
-
-#-----------------------------------------------------------------
-#independent t-test
-#-----------------------------------------------------------------
-AS_sum_control <- subset(AS_sum2, condition!="Atomoxetine")
-
-
-res.ftest <- var.test(no_correct_sac ~ condition, data = AS_sum_control)
-res.ftest
-
-#F = 1.1053, num df = 24, denom df = 17, p-value = 0.846
-
-
-t_test_PvC <- t.test(no_correct_sac ~ condition, data = AS_sum_control, var.equal = TRUE)
-t_test_PvC
-
-#t = -0.076006, df = 41, p-value = 0.9398
-
-#-----------------------------------------------------------------
-#paired t-test (placebo vs atomoxetine)
-#-----------------------------------------------------------------
-AS_sum_PD <- subset(AS_sum2, condition!="Control")
-
-diff <- with(AS_sum_PD, 
-             no_correct_sac[condition == "Placebo"] - no_correct_sac[condition == "Atomoxetine"])
-
-# Shapiro-Wilk normality test for the differences
-shapiro.test(diff)
-
-#W = 0.9643, p-value = 0.6862 --> below p=0.05 therefore can't assume normality 
-
-#PvA = placebo and atomoxetine comparison
-
-t_test_PvA <- t.test(no_correct_sac ~ condition, data = AS_sum_PD, paired = TRUE)
-t_test_PvA
-
-#t = -1.6265, df = 17, p-value = 0.1222
-
-#mean
-
-bar_nosac2 <- ggplot(nocorrect, aes(x=condition, y=mean)) + geom_bar(stat='identity')
-bar_nosac2 + xlab("") + ylab("Mean saccade incorrect 1st and 2nd (%)")
 
 bar_error1st2 <- ggplot(error_rate, aes(x=condition, y=mean)) + geom_bar(stat='identity')
 bar_error1st2 + xlab("") + ylab("Mean error rate in 1st saccade (%)")
@@ -582,6 +479,8 @@ bar_error1st2 + xlab("") + ylab("Mean error rate in 1st saccade (%)")
 
 bar_corrective2 <- ggplot(as_corrective, aes(x=condition, y=mean)) + geom_bar(stat='identity')
 bar_corrective2 + xlab("") + ylab("Mean corrective saccades (%)")
+
+#=============================================================================================
 
 
 
@@ -1165,7 +1064,7 @@ p.adjust(p.value_am, method = "holm")
 
 
 #=============================================================================================
-#3x2 analysis -  based on correct/incorrect
+#ANOVA - 3x2 analysis - based on correct/incorrect
 #=============================================================================================
 
 #join based on ID_trial
@@ -1339,7 +1238,7 @@ write.csv(correct_long, 'correct_vertical.csv')
 
 
 #--------------------------------------------------------------------------------------------------------------
-#start from here
+
 correct_long <- read.csv("correct_vertical.csv", header = TRUE, quote="\"", 
                          stringsAsFactors= TRUE, strip.white = TRUE, na.strings=c("NA", "-", "?"))
 attach(correct_long)
@@ -1372,13 +1271,11 @@ correct_sum <- correct_long %>%
   mutate(se=sd/sqrt(n))  %>%
   mutate(ic=se * qt((1-0.05)/2 + .5, n-1))
 
-#latency
+#Latency PLOT
 plot_1 <- ggplot(correct_long, aes(x=condition, y=latency_mean, color=Direction, label=Direction)) +
   geom_boxplot(outlier.shape=NA)
 
 plot_1
-
-
 
 plot_1_1 <- ggplot(correct_long, aes(x=condition, y=latency_mean, color=Direction, label=Direction)) +
   geom_boxplot(outlier.shape=NA) +
@@ -1433,48 +1330,5 @@ pairs(m1)
 m2 <- emmeans(aov1, "Group_1", by = "LC_segment")
 pairs(m2)
 
-
-
-
-
-
-
-
-
-
-
-p35 <-  ggboxplot(as_dur, x = "condition", y = "duration_mean",
-                  color = "condition", line.color = "gray", line.size = 0.4,
-                  xlab = FALSE, ylab = "Mean duration (ms)",
-                  palette = c("#f3a953", "#3e64ff", "#ff5151"), add = "jitter") + 
-  theme(legend.position="none") 
-
-
-#peak velocity
-plot_2 <- ggplot(correct_long, aes(x=condition, y=peak_velocity_mean, color=on_target, label=on_target)) +
-  geom_boxplot(outlier.shape=NA) +
-  geom_point(pch = 20, position = position_jitterdodge())
-
-plot_2
-
-
-plot_2_1 <- ggplot(correct_long, aes(x=condition, y=peak_velocity_mean, color=on_target, label=on_target)) +
-  geom_boxplot(outlier.shape=NA)
-
-plot_2_1
-
-
-#amplitude
-plot_3 <- ggplot(correct_long, aes(x=condition, y=amplitude_mean, color=on_target, label=on_target)) +
-  geom_boxplot(outlier.shape=NA) +
-  geom_point(pch = 20, position = position_jitterdodge())
-
-plot_3
-
-
-plot_3_1 <- ggplot(correct_long, aes(x=condition, y=amplitude_mean, color=on_target, label=on_target)) +
-  geom_boxplot(outlier.shape=NA)
-
-plot_3_1
 
 
